@@ -1,20 +1,35 @@
-# Reproducible Research: Peer Assessment 1
+Reproducible Research: Peer Assesment 1
+=======================================
 
 
-## Loading and preprocessing the data
+### Introduction
+It is now possible to collect a large amount of data about personal movement using activity monitoring devices such as a Fitbit, Nike Fuelband, or Jawbone Up. These type of devices are part of the "quantified self" movement - a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks.
+
+This assignment makes use of data from a personal activity monitoring device. This device collects data at 5 minute intervals through out the day. The data consists of two months of data from an anonymous individual collected during the months of October and November, 2012 and include the number of steps taken in 5 minute intervals each day.
+
+### Loading the Data
+First let's go ahead and load the data into R and take a quick look at it (We're assuming that the working directory already contains the file).
+```{r, echo=TRUE}
+activity <- read.csv("activity.csv")
+summary(activity)
+```
+The first thing we should note it the 2,304 NA's in the data set. This makes up roughtly 13% of all the data points. For this first part we will simply omit these data points in our calculation. We will address them in the latter half of this assignment.
+
+### What is mean total number of steps taken per day?
+We will use the aggregate function to answer this question. First we will sum the total number of steps taken per day and take a look at the summary of our new data frame.
+
+```{r, echo=TRUE}
+sum <- aggregate(steps ~ date, data = activity, FUN=sum, na.rm=TRUE)
+
+summary(sum)
+```
+We can note from this summary that the mean is 10,766 steps per day and the median is 10,765.
+
+We can plot a histogram of the data to get a better look at the spread.
+```{r echo=TRUE}
+hist(sum$steps, breaks=10, col="blue", xlab="Total Steps Per Day", main = "Frequency of Total Steps Per Day")
+abline(v=mean(sum$steps))
+abline(v=median(sum$steps))
+```
 
 
-
-## What is mean total number of steps taken per day?
-
-
-
-## What is the average daily activity pattern?
-
-
-
-## Imputing missing values
-
-
-
-## Are there differences in activity patterns between weekdays and weekends?
