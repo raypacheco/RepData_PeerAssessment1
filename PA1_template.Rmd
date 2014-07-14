@@ -19,17 +19,86 @@ The first thing we should note it the 2,304 NA's in the data set. This makes up 
 We will use the aggregate function to answer this question. First we will sum the total number of steps taken per day and take a look at the summary of our new data frame.
 
 ```{r, echo=TRUE}
-sum <- aggregate(steps ~ date, data = activity, FUN=sum, na.rm=TRUE)
+summed <- aggregate(steps ~ date, data = activity, FUN=sum, na.rm=TRUE)
 
-summary(sum)
+summary(summed)
 ```
 We can note from this summary that the mean is 10,766 steps per day and the median is 10,765.
 
-We can plot a histogram of the data to get a better look at the spread.
+We can plot a histogram of the data to get a better look at the spread. We will also plot the lines where the mean and median are in relation to the histogram. Though, given how close the numbers are they will only show up as one solid line.
+
 ```{r echo=TRUE}
-hist(sum$steps, breaks=10, col="blue", xlab="Total Steps Per Day", main = "Frequency of Total Steps Per Day")
-abline(v=mean(sum$steps))
-abline(v=median(sum$steps))
+hist(summed$steps, breaks=10, col="blue", xlab="Total Steps Per Day", main = "Frequency of Total Steps Per Day")
+abline(v=mean(summed$steps))
+abline(v=median(summed$steps))
 ```
 
+###What is the average daily activity pattern?
+Again, we will use the aggregate function for this question. This time we will average the numbers of steps taken in each interval. We can then use the which.max function to find which interval has the maximum average number of steps.
+
+```{r echo=TRUE}
+avg <- aggregate(steps~interval, data=activity, FUN=mean, na.rm=TRUE)
+
+avg[which.max(avg$steps),]
+```
+
+We find that the maximum number of steps is 206.2 at the 835 interval. Again let us plot this to get a better visual of it.
+
+``` {r echo=TRUE}
+plot(avg, type="l", xlab= "Interval", ylab="Average # of Steps", main = "Time Series of Average Number of Steps")
+abline(v=avg$interval[which.max(avg$steps)], col = "blue")
+```
+
+###Imputing missing values
+As we noted earlier, there are 2,304 NA's in our data set that we simply ignored for our previous calculations. For this portion, we will fill in the missing values using the mean for that 5-minute interval by day of the week.
+
+We will do the following to get our new dataset.
+
+1. Add a new column of the day of the week.
+```{r echo=TRUE}
+activity$date <- as.Date(activity$date, "%Y-%m-%d") ##currently has class factor
+
+activity$day <- weekdays(activity$date)
+```
+
+2. Split the data into two: complete cases and all missing values.
+```{r echo=TRUE}
+complete <- activity[complete.cases(activity),]
+
+incomplete <- activity[!complete.cases(activity), 2:4] ## leave off steps column
+```
+
+3. Create a new aggregate data frame based on the complete cases data frame for average steps by day by interval.
+```{r echo=TRUE}
+avgcomplete <- aggregate(steps~day+interval, data=complete, FUN=mean)
+```
+
+4. Add the average numbers of steps to the incomplete cases data frame using the aggregate data frame we just created.
+```{r echo=TRUE}
+completed <- merge(incomplete, avgcomplete, by=c("day", "interval"))
+```
+
+5. Recombine the split frames to produce our new dataset with the missing data filled in.
+```{r echo=TRUE}
+allcomplete <- rbind(completed, complete)
+```
+
+Now let us aggregate our new dataset  the same way we did for the first part. We can also plot the histogram and compare it to our first one.
+```{r echo=TRUE}
+sumcomplete <- aggregate(steps ~ date, data=allcomplete, FUN=sum)
+
+par(mfrow=c(1,2))
+
+hist(sumcomplete$steps, breaks=10, col="red", xlab="Steps", main="Inputed NA's")
+abline(v=mean(sumcomplete$steps))
+abline(v=median(sumcomplete$steps))
+
+hist(summed$steps, breaks=10, col="blue", xlab="Steps", main="Uninputed NA's" )
+abline(v=median(summed$steps))
+summary(sumcomplete)
+```
+
+As expected the mean and median have shifted from those that we calculated earlier with the NA's simply removed.
+
+###Are there differences in activity between weekdays and weekends?
 
