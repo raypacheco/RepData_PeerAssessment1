@@ -273,41 +273,31 @@ As we noted earlier, there are 2,304 NA&#39;s in our data set that we simply ign
 
 <p>We will do the following to get our new dataset.</p>
 
-<ol>
-<li>Add a new column of the day of the week.</li>
-</ol>
+<p>1. Add a new column of the day of the week.</p>
 
 <pre><code class="r">activity$date &lt;- as.Date(activity$date, &quot;%Y-%m-%d&quot;) ##currently has class factor
 
 activity$day &lt;- weekdays(activity$date)
 </code></pre>
 
-<ol>
-<li>Split the data into two: complete cases and all missing values.</li>
-</ol>
+<p>2. Split the data into two: complete cases and all missing values.</p>
 
 <pre><code class="r">complete &lt;- activity[complete.cases(activity),]
 
 incomplete &lt;- activity[!complete.cases(activity), 2:4] ## leave off steps column
 </code></pre>
 
-<ol>
-<li>Create a new aggregate data frame based on the complete cases data frame for average steps by day by interval.</li>
-</ol>
+<p>3. Create a new aggregate data frame based on the complete cases data frame for average steps by day by interval.</p>
 
 <pre><code class="r">avgcomplete &lt;- aggregate(steps~day+interval, data=complete, FUN=mean)
 </code></pre>
 
-<ol>
-<li>Add the average numbers of steps to the incomplete cases data frame using the aggregate data frame we just created.</li>
-</ol>
+<p>4. Add the average numbers of steps to the incomplete cases data frame using the aggregate data frame we just created.</p>
 
 <pre><code class="r">completed &lt;- merge(incomplete, avgcomplete, by=c(&quot;day&quot;, &quot;interval&quot;))
 </code></pre>
 
-<ol>
-<li>Recombine the split frames to produce our new dataset with the missing data filled in.</li>
-</ol>
+<p>5. Recombine the split frames to produce our new dataset with the missing data filled in.</p>
 
 <pre><code class="r">allcomplete &lt;- rbind(completed, complete)
 </code></pre>

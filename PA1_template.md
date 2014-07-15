@@ -90,7 +90,7 @@ As we noted earlier, there are 2,304 NA's in our data set that we simply ignored
 
 We will do the following to get our new dataset.
 
-1. Add a new column of the day of the week.
+1\. Add a new column of the day of the week.
 
 ```r
 activity$date <- as.Date(activity$date, "%Y-%m-%d") ##currently has class factor
@@ -98,7 +98,7 @@ activity$date <- as.Date(activity$date, "%Y-%m-%d") ##currently has class factor
 activity$day <- weekdays(activity$date)
 ```
 
-2. Split the data into two: complete cases and all missing values.
+2\. Split the data into two: complete cases and all missing values.
 
 ```r
 complete <- activity[complete.cases(activity),]
@@ -106,19 +106,19 @@ complete <- activity[complete.cases(activity),]
 incomplete <- activity[!complete.cases(activity), 2:4] ## leave off steps column
 ```
 
-3. Create a new aggregate data frame based on the complete cases data frame for average steps by day by interval.
+3\. Create a new aggregate data frame based on the complete cases data frame for average steps by day by interval.
 
 ```r
 avgcomplete <- aggregate(steps~day+interval, data=complete, FUN=mean)
 ```
 
-4. Add the average numbers of steps to the incomplete cases data frame using the aggregate data frame we just created.
+4\. Add the average numbers of steps to the incomplete cases data frame using the aggregate data frame we just created.
 
 ```r
 completed <- merge(incomplete, avgcomplete, by=c("day", "interval"))
 ```
 
-5. Recombine the split frames to produce our new dataset with the missing data filled in.
+5\. Recombine the split frames to produce our new dataset with the missing data filled in.
 
 ```r
 allcomplete <- rbind(completed, complete)
